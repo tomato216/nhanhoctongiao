@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Game: Ôn Tập Các Đặc Tính Của Tôn Giáo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Lexend', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .option-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .pulse-subtle {
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col justify-between p-4 sm:p-6">
+
+    <div class="max-w-3xl w-full mx-auto my-auto">
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-semibold rounded-full border border-amber-500/30 mb-2">
+                <i class="fa-solid fa-graduation-cap mr-1"></i> Luyện Tập Môn Nhân Học Tôn Giáo
+            </span>
+            <h1 class="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-orange-300 to-amber-400">
+                Các Đặc Tính Căn Bản Của Tôn Giáo Tín Ngưỡng
+            </h1>
+        </header>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="glass-panel rounded-2xl p-6 sm:p-8 text-center shadow-2xl">
+            <div class="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/30">
+                <i class="fa-solid fa-place-of-worship text-3xl text-amber-400"></i>
+            </div>
+            <h2 class="text-xl font-semibold mb-3">Chào mừng bạn đến với Mini Game!</h2>
+            <p class="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed">
+
+                <span class="text-amber-300 font-medium">Tính thiêng • Tính biểu tượng • Tính mê hoặc • Tính hệ thống • Tính nguyên hợp • Tính sáng tạo</span>
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+                <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-regular fa-circle-question text-amber-400"></i> 9 Câu hỏi
+                </div>
+                <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i> Giải thích chi tiết từng đáp án
+                </div>
+            </div>
+            <button onclick="startGame()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+                Bắt Đầu Ngay <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <!-- Progress Bar -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center text-xs text-slate-300 mb-1">
+                    <span id="question-count">Câu hỏi 1 / 9</span>
+                    <span id="score-display">Điểm: 0</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                    <div id="progress-bar" class="bg-gradient-to-r from-amber-400 to-orange-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="glass-panel rounded-2xl p-5 sm:p-7 shadow-2xl mb-4 relative">
+                <p id="question-text" class="text-base sm:text-lg text-slate-100 font-medium leading-relaxed mb-6">
+                    Nội dung câu hỏi sẽ hiển thị ở đây...
+                </p>
+
+                <!-- Answer Options -->
+                <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <!-- Dynamic Options -->
+                </div>
+
+                <!-- Explanation Box -->
+                <div id="explanation-box" class="hidden mt-4 p-4 rounded-xl border text-sm leading-relaxed transition-all">
+                    <div id="explanation-title" class="font-bold mb-1 flex items-center gap-2"></div>
+                    <div id="explanation-text" class="text-slate-200"></div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-between items-center">
+                <button id="next-btn" onclick="nextQuestion()" disabled class="ml-auto px-6 py-2.5 bg-slate-700 text-slate-400 cursor-not-allowed font-semibold rounded-xl shadow-md transition-all">
+                    Câu tiếp theo <i class="fa-solid fa-chevron-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden glass-panel rounded-2xl p-6 sm:p-8 text-center shadow-2xl">
+            <div class="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/40">
+                <i class="fa-solid fa-trophy text-4xl text-amber-300"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Hoàn Thành Bài Luyện Tập!</h2>
+            <p class="text-slate-300 text-sm mb-6">Bạn đã trải qua toàn bộ 9 câu hỏi về đặc tính của tôn giáo tín ngưỡng.</p>
+            
+            <div class="bg-slate-900/60 rounded-xl p-4 border border-slate-700/60 mb-6 max-w-xs mx-auto">
+                <div class="text-3xl font-extrabold text-amber-400 mb-1" id="final-score">0 / 9</div>
+                <div class="text-xs text-slate-400">Tổng điểm chính xác</div>
+            </div>
+
+            <p id="final-message" class="text-sm text-slate-300 mb-6 italic"></p>
+
+            <button onclick="startGame()" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg transition-all transform hover:scale-105">
+                <i class="fa-solid fa-rotate-right mr-2"></i> Chơi Lại
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-slate-400 py-4 mt-auto">
+        Nhóm 2 - Nhân học Tôn giáo
+    </footer>
+
+    <script>
+        const quizData = [
+            {
+                question: "Khi một khúc gỗ hoặc tảng đá vô tri được nghệ nhân tạc thành pho tượng Phật và trải qua lễ \"hô thần nhập tượng\", bức tượng đó không còn là vật bình thường mà trở thành một vật thiêng được người dân kính bái. Quá trình biến một vật thông thường thành vật mang tính thiêng này thể hiện đặc tính nào?",
+                options: ["Tính thiêng", "Tính biểu tượng", "Tính nguyên hợp", "Tính hệ thống"],
+                answer: 0,
+                explanation: "Tính thiêng thể hiện qua quá trình thiêng hóa. Một vật vốn bình thường được cộng đồng thiêng hóa qua nghi lễ, tạo nên ranh giới với cái phàm tục."
+            },
+            {
+                question: "Khi bạn bước vào một nhà thờ Công giáo và nhìn thấy cây Thánh giá, bản thân cây Thánh giá chỉ là hai thanh gỗ chép vào nhau, nhưng nó lại đại diện cho sự hy sinh, cứu rỗi của Chúa Giê-su. Việc sử dụng cái hữu hình để giúp con người tri nhận được cái vô hình này phản ánh đặc tính gì?",
+                options: ["Tính thiêng", "Tính biểu tượng", "Tính nguyên hợp", "Tính mê hoặc"],
+                answer: 1,
+                explanation: "Tính biểu tượng giúp sử dụng hình ảnh hữu hình (cái biểu đạt) để con người tri nhận được những giá trị, đức tin vô hình (cái được biểu đạt)."
+            },
+            {
+                question: "Trong nhiều ngôi chùa Bắc tông ở Việt Nam hiện nay, bên cạnh các pho tượng Phật, người ta còn đặt ban thờ Mẫu (tín ngưỡng dân gian), hay thậm chí thờ cả tượng Bác Hồ. Việc dung nạp, kết hợp nhiều niềm tin, hình mẫu tôn giáo và tín ngưỡng khác nhau dưới cùng một mái chùa minh chứng cho đặc tính nào?",
+                options: ["Tính hệ thống", "Tính sáng tạo", "Tính nguyên hợp", "Tính mê hoặc"],
+                answer: 2,
+                explanation: "Tính nguyên hợp là sự dung hợp, kết hợp nhiều hình mẫu, thực hành tôn giáo và tín ngưỡng khác nhau dưới cùng một không gian hay đời sống tôn giáo."
+            },
+            {
+                question: "Giáo hội Công giáo có một cấu trúc tổ chức vô cùng bài bản từ Tòa thánh Vatican xuống tới các Giáo phận và Giáo xứ, đi kèm với hệ thống giáo lý, chức sắc và các cơ sở thờ tự được quy định thống nhất trên toàn thế giới để duy trì hoạt động của cộng đồng tín đồ. Sự liên kết, tổ chức chặt chẽ tạo nên \"tính trồi\" và \"tính nhất thể hóa\" này thể hiện đặc tính gì?",
+                options: ["Tính sáng tạo", "Tính hệ thống", "Tính thiêng", "Tính biểu tượng"],
+                answer: 1,
+                explanation: "Tính hệ thống là sự liên kết và tổ chức chặt chẽ các thành tố (giáo lý, chức sắc, cơ sở thờ tự, quy định) thành một chỉnh thể ổn định nhằm duy trì sức mạnh và hoạt động của cộng đồng."
+            },
+            {
+                question: "Trong một nghi lễ, một người tham dự nghe lời cầu nguyện và những lời giảng về Thiên đường. Những hình ảnh được mô tả khiến họ cảm thấy bị cuốn hút mạnh mẽ, tin tưởng tuyệt đối và mong muốn hướng tới một tương lai tốt đẹp hơn. Đây là biểu hiện của đặc tính nào của tôn giáo?",
+                options: ["Tính thiêng", "Tính mê hoặc", "Tính biểu tượng", "Tính sáng tạo"],
+                answer: 1,
+                explanation: "Tính mê hoặc thể hiện ở khả năng lôi cuốn và hấp dẫn mạnh mẽ tín đồ, khiến họ tin theo một cách tuyệt đối và hướng tới những điều tốt đẹp mà tôn giáo mô tả."
+            },
+            {
+                question: "Một cộng đồng tôn giáo có giáo lý, chức sắc, tín đồ, cơ sở thờ tự và các quy định được tổ chức thành một chỉnh thể. Các thành tố này liên kết với nhau để duy trì hoạt động ổn định của cộng đồng. Đây là biểu hiện của đặc tính nào?",
+                options: ["Tính nguyên hợp", "Tính biểu tượng", "Tính hệ thống", "Tính thiêng"],
+                answer: 2,
+                explanation: "Tính hệ thống giúp liên kết các thành tố tôn giáo thành một chỉnh thể ổn định, giúp cộng đồng duy trì hoạt động lâu dài và bền vững."
+            },
+            {
+                question: "Một nghệ nhân dựa trên những câu chuyện về Đức Phật để tạo ra một pho tượng với hình dáng, tư thế và các chi tiết chưa từng có trước đó. Tác phẩm sau đó trở thành một thành tố quen thuộc trong đời sống tôn giáo. Đây là biểu hiện của đặc tính nào?",
+                options: ["Tính sáng tạo", "Tính mê hoặc", "Tính thiêng", "Tính nguyên hợp"],
+                answer: 0,
+                explanation: "Tính sáng tạo nhấn mạnh khả năng con người tạo ra những hình thức, biểu tượng và giá trị mới trong đời sống tôn giáo chứ không chỉ lặp lại cái có sẵn."
+            },
+            {
+                question: "Tại một ngôi chùa ở Việt Nam, bên cạnh việc thờ Phật, người dân còn thờ Mẫu và một số vị thần có nguồn gốc từ tín ngưỡng dân gian. Các thực hành và niềm tin khác nhau cùng tồn tại trong một không gian tôn giáo. Đây là biểu hiện của đặc tính nào?",
+                options: ["Tính hệ thống", "Tính nguyên hợp", "Tính biểu tượng", "Tính mê hoặc"],
+                answer: 1,
+                explanation: "Tính nguyên hợp thể hiện qua sự kết hợp, dung hợp nhiều hình mẫu tôn giáo và tín ngưỡng dân gian cùng tồn tại trong một môi trường."
+            },
+            {
+                question: "Một tảng đá vốn là vật bình thường được thực hiện nghi lễ \"hô thần nhập tượng\". Sau nghi lễ, cộng đồng không còn xem nó đơn thuần là một tảng đá mà coi đó là một pho tượng mang tính linh thiêng và phải được đối xử khác với những vật phàm tục. Điều gì được thể hiện rõ nhất trong tình huống này?",
+                options: ["Tính biểu tượng", "Tính sáng tạo", "Tính thiêng", "Tính hệ thống"],
+                answer: 2,
+                explanation: "Tính thiêng thể hiện qua sự phân biệt giữa cái thiêng và cái phàm. Việc hô thần nhập tượng biến vật phàm tục thành vật thiêng được kính bái."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        function startGame() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('question-count').innerText = `Câu hỏi ${currentQuestion + 1} / ${quizData.length}`;
+            document.getElementById('score-display').innerText = `Điểm: ${score}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestion) / quizData.length) * 100}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            // Reset explanation and next button
+            const expBox = document.getElementById('explanation-box');
+            expBox.classList.add('hidden');
+            expBox.className = "hidden mt-4 p-4 rounded-xl border text-sm leading-relaxed transition-all";
+            
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = true;
+            nextBtn.className = "ml-auto px-6 py-2.5 bg-slate-700 text-slate-400 cursor-not-allowed font-semibold rounded-xl shadow-md transition-all";
+
+            selectedOption = null;
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full p-4 text-left rounded-xl bg-slate-800/80 border border-slate-700 text-slate-200 font-medium text-sm flex items-center justify-between';
+                btn.innerHTML = `
+                    <span><strong class="text-amber-400 mr-2">${String.fromCharCode(65 + index)}.</strong> ${opt}</span>
+                    <i class="fa-regular fa-circle text-slate-500 status-icon"></i>
+                `;
+                btn.onclick = () => selectOption(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(index) {
+            if (selectedOption !== null) return; // Prevent changing choice
+            selectedOption = index;
+
+            const q = quizData[currentQuestion];
+            const buttons = document.querySelectorAll('#options-container button');
+            const expBox = document.getElementById('explanation-box');
+            const expTitle = document.getElementById('explanation-title');
+            const expText = document.getElementById('explanation-text');
+
+            if (index === q.answer) {
+                score++;
+                document.getElementById('score-display').innerText = `Điểm: ${score}`;
+                buttons[index].className = 'w-full p-4 text-left rounded-xl bg-emerald-900/40 border-2 border-emerald-500 text-emerald-200 font-medium text-sm flex items-center justify-between shadow-lg';
+                buttons[index].querySelector('.status-icon').className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+                
+                expBox.className = "mt-4 p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/30 text-emerald-200 text-sm leading-relaxed";
+                expTitle.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> Đúng rồi!`;
+            } else {
+                buttons[index].className = 'w-full p-4 text-left rounded-xl bg-rose-900/40 border-2 border-rose-500 text-rose-200 font-medium text-sm flex items-center justify-between shadow-lg';
+                buttons[index].querySelector('.status-icon').className = 'fa-solid fa-circle-xmark text-rose-400 text-lg';
+
+                // Highlight correct answer
+                buttons[q.answer].className = 'w-full p-4 text-left rounded-xl bg-emerald-900/30 border border-emerald-500/60 text-emerald-200 font-medium text-sm flex items-center justify-between';
+                buttons[q.answer].querySelector('.status-icon').className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+
+                expBox.className = "mt-4 p-4 rounded-xl border border-rose-500/40 bg-rose-950/30 text-rose-200 text-sm leading-relaxed";
+                expTitle.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> Chưa chính xác!`;
+            }
+
+            expText.innerText = q.explanation;
+            expBox.classList.remove('hidden');
+
+            // Enable next button
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = false;
+            nextBtn.className = "ml-auto px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg transition-all transform hover:scale-105";
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function showEndScreen() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${score} / ${quizData.length}`;
+
+            const msg = document.getElementById('final-message');
+            const percent = (score / quizData.length) * 100;
+            if (percent === 100) {
+                msg.innerText = "Xuất sắc! Bạn đã nắm vững hoàn toàn 6 đặc tính của Tôn giáo!";
+            } else if (percent >= 70) {
+                msg.innerText = "Khá tốt! Bạn đã hiểu rõ hầu hết các khái niệm và tình huống.";
+            } else {
+                msg.innerText = "Bạn nên ôn tập lại lý thuyết các đặc tính để đạt điểm cao hơn nhé!";
+            }
+        }
+    </script>
+</body>
+</html>
